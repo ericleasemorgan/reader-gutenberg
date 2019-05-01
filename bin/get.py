@@ -20,5 +20,6 @@ if len( sys.argv ) != 2 :
 gid = int( sys.argv[ 1 ] )
 
 # do the work and done
-print( strip_headers( load_etext( gid ) ).strip() )
+etext = strip_headers( load_etext( gid ) ).strip()
+print( etext )
 exit()

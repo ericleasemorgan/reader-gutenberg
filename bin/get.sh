@@ -4,9 +4,13 @@
 
 # Eric Lease Morgan <eric_morgan@infomotions.com>
 # April 29, 2019 - first cut
+# May    1, 2019 - added bits of abstraction
 
 
-# configure, do the work, and done
+# configure
 export GUTENBERG_DATA='./etc'
-./bin/get.py $1
+GET='./bin/get.py'
+
+# do the work and done; needs sanity checking
+$GET $1
 exit
