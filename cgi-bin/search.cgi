@@ -44,7 +44,7 @@ else {
 
 	# re-initialize
 	my $items = '';
-	my @ids  = ();
+	my @gids  = ();
 	
 	# build the search options
 	my %search_options                   = ();
@@ -103,6 +103,9 @@ else {
 		my $gid    = $doc->value_for( 'gid' );
 		my $file   = $doc->value_for( 'file' );
 		
+		# update the list of dids
+		push(@gids, $gid );
+
 		my @classifications = ();
 		foreach my $classification ( $doc->values_for( 'classification' ) ) {
 		
@@ -144,9 +147,13 @@ else {
 					
 	}	
 
+	my $gid2urls = &ids2urls;
+	$gid2urls    =~ s/##IDS##/join( ' ', @gids )/e;
+
 	# build the html
 	$html =  &results_template;
 	$html =~ s/##RESULTS##/&results/e;
+	$html =~ s/##ID2URLS##/$gid2urls/ge;
 	$html =~ s/##QUERY##/$sanitized/e;
 	$html =~ s/##TOTAL##/$total/e;
 	$html =~ s/##HITS##/scalar( @hits )/e;
@@ -188,7 +195,7 @@ sub get_facets {
 sub results {
 
 	return <<EOF
-	<p>Your search found ##TOTAL## item(s) and ##HITS## item(s) are displayed.</p>
+	<p>Your search found ##TOTAL## item(s) and ##HITS## item(s) are displayed. ##ID2URLS##</p>
 		
 	<h3>Items</h3><ol>##ITEMS##</ol>
 EOF
@@ -235,7 +242,8 @@ sub template {
 
 <div class="col-3 col-m-3 menu">
   <ul>
-    <li><a href="/sandbox/gutenberg/cgi-bin/search.cgi">Home</a></li>
+		<li><a href="/sandbox/gutenberg/cgi-bin/search.cgi">Home</a></li>
+		<li><a href="/sandbox/gutenberg/cgi-bin/gids2urls.cgi">Get URLs</a></li>
  </ul>
 </div>
 
@@ -286,7 +294,8 @@ sub results_template {
 
 <div class="col-3 col-m-3 menu">
   <ul>
-    <li><a href="/sandbox/gutenberg/cgi-bin/search.cgi">Home</a></li>
+		<li><a href="/sandbox/gutenberg/cgi-bin/search.cgi">Home</a></li>
+		<li><a href="/sandbox/gutenberg/cgi-bin/gids2urls.cgi">Get URLs</a></li>
  </ul>
 </div>
 
@@ -296,7 +305,7 @@ sub results_template {
 		Query: <input type='text' name='query' value='##QUERY##' size='50' autofocus="autofocus"/>
 		<input type='submit' value='Search' />
 		</form>
-		
+
 		##RESULTS##
 		
 	</div>
@@ -309,6 +318,14 @@ sub results_template {
 
 </body>
 </html>
+EOF
+
+}
+
+sub ids2urls {
+
+	return <<EOF
+(<a href="/sandbox/gutenberg/cgi-bin/gids2urls.cgi?gids=##IDS##">List URLs</a>)
 EOF
 
 }
