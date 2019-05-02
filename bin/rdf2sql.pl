@@ -102,8 +102,8 @@ foreach my $subject ( $subjects->get_nodelist ) {
 
 	my $item = $subject->find( './rdf:Description/rdf:value' );
 	
-	# check for call number-esque value
-	if ( length( $item ) == 2 ) { push(  @classifications, $item ) }
+	# check for call number-esque values
+	if ( length( $item ) < 3 ) { push(  @classifications, $item ) }
 	else { push( @subjects, $item ) }
 	
 }
