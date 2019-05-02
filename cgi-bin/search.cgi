@@ -7,7 +7,7 @@
 
 
 # configure
-use constant FACETFIELD => ( 'facet_subject', 'facet_author' );
+use constant FACETFIELD => ( 'facet_subject', 'facet_author', 'facet_classification' );
 use constant SOLR       => 'http://localhost:8983/solr/gutenberg';
 use constant ROWS       => 199;
 use constant NUMERALS   => ( '1'=>'I','2'=>'II','3'=>'III','4'=>'IV', '5'=>'V', '6'=>'VI', '7'=>'VII', '8'=>'VIII', '9'=>'IX', '10'=>'X' );
@@ -54,6 +54,17 @@ else {
 	# search
 	my $response = $solr->search( $query, \%search_options );
 
+	# build a list of classification facets
+	my @facet_classification = ();
+	my $classification_facets = &get_facets( $response->facet_counts->{ facet_fields }->{ facet_classification } );
+	foreach my $facet ( sort { $$classification_facets{ $b } <=> $$classification_facets{ $a } } keys %$classification_facets ) {
+	
+		my $encoded = uri_encode( $facet );
+		my $link = qq(<a href='/sandbox/gutenberg/cgi-bin/search.cgi?query=$sanitized AND classification:"$encoded"'>$facet</a>);
+		push @facet_classification, $link . ' (' . $$classification_facets{ $facet } . ')';
+		
+	}
+
 	# build a list of author facets
 	my @facet_author = ();
 	my $author_facets = &get_facets( $response->facet_counts->{ facet_fields }->{ facet_author } );
@@ -90,6 +101,15 @@ else {
 		my $title    = $doc->value_for(  'title' );
 		my $gid      = $doc->value_for(  'gid' );
 		
+		my @classifications = ();
+		foreach my $classification ( $doc->values_for( 'classification' ) ) {
+		
+			my $classification = qq(<a href='/sandbox/gutenberg/cgi-bin/search.cgi?query=classification:"$classification"'>$classification</a>);
+			push( @classifications, $classification );
+
+		}
+		@classifications = sort( @classifications );
+		
 		my @subjects = ();
 		foreach my $subject ( $doc->values_for( 'subject' ) ) {
 		
@@ -109,10 +129,11 @@ else {
 		}
 
 		# create a item
-		my $item = &item( $title, $author, scalar( @subjects ), $gid );
+		my $item = &item( $title, $author, scalar( @subjects ), scalar( @classifications ), $gid );
 		$item =~ s/##TITLE##/$title/g;
 		$item =~ s/##AUTHOR##/$author/eg;
 		$item =~ s/##SUBJECTS##/$subjects/eg;
+		$item =~ s/##CLASSIFICATIONS##/join( '; ', @classifications )/eg;
 		$item =~ s/##GID##/$gid/ge;
 
 		# update the list of items
@@ -128,6 +149,7 @@ else {
 	$html =~ s/##HITS##/scalar( @hits )/e;
 	$html =~ s/##FACETSAUTHOR##/join( '; ', @facet_author )/e;
 	$html =~ s/##FACETSSUBJECT##/join( '; ', @facet_subject )/e;
+	$html =~ s/##FACETSCLASSIFICATION##/join( '; ', @facet_classification )/e;
 	$html =~ s/##ITEMS##/$items/e;
 
 }
@@ -174,12 +196,14 @@ EOF
 # specific item template
 sub item {
 
-	my $title     = shift;
-	my $author    = shift;
-	my $subjects  = shift;
+	my $title           = shift;
+	my $author          = shift;
+	my $subjects        = shift;
+	my $classifications = shift;
 	my $item      = "<li class='item'><a href='/sandbox/gutenberg/cgi-bin/get.cgi?gid=##GID##'>##TITLE##</a><ul>";
-	if ( $author ) { $item .= "<li style='list-style-type:circle'>##AUTHOR##</li>" }
-	if ( $subjects ) { $item .= "<li style='list-style-type:circle'>##SUBJECTS##</li>" }
+	if ( $author )          { $item .= "<li style='list-style-type:circle'>##AUTHOR##</li>" }
+	if ( $subjects )        { $item .= "<li style='list-style-type:circle'>##SUBJECTS##</li>" }
+	if ( $classifications ) { $item .= "<li style='list-style-type:circle'>##CLASSIFICATIONS##</li>" }
 	$item .= "<li style='list-style-type:circle'>##GID##</li>";
 	$item .= "</ul></li>";
 	
@@ -277,6 +301,7 @@ sub results_template {
 	<div class="col-3 col-m-3">
 	<h3>Author facets</h3><p>##FACETSAUTHOR##</p>
 	<h3>Subject facets</h3><p>##FACETSSUBJECT##</p>
+	<h3>Classification facets</h3><p>##FACETSCLASSIFICATION##</p>
 	</div>
 
 </body>

@@ -27,16 +27,18 @@
   <field name="_version_" type="long"         indexed="true"      stored="false"/>
   
   <!-- my fields -->
-  <field name="author"         type="text_general"  multiValued="false"   indexed="true"   stored="true"  />
-  <field name="facet_author"   type="string"        multiValued="false"   indexed="true"   stored="true"  />
-  <field name="facet_language" type="string"        multiValued="false"   indexed="true"   stored="true"  />
-  <field name="facet_subject"  type="string"        multiValued="true"    indexed="true"   stored="true"  />
-  <field name="gid"            type="int"           multiValued="false"   indexed="true"   stored="true"  />
-  <field name="language"       type="text_general"  multiValued="false"   indexed="true"   stored="true"  />
-  <field name="fulltext"       type="text_general"  multiValued="false"   indexed="true"   stored="false" />
-  <field name="rights"         type="text_general"  multiValued="false"   indexed="true"   stored="true"  />
-  <field name="subject"        type="text_general"  multiValued="true"    indexed="true"   stored="true"  />
-  <field name="title"          type="text_general"  multiValued="false"   indexed="true"   stored="true"  />
+  <field name="author"               type="text_general"  multiValued="false"   indexed="true"   stored="true"  />
+  <field name="classification"       type="text_general"  multiValued="true"    indexed="true"   stored="true"  />
+  <field name="facet_author"         type="string"        multiValued="false"   indexed="true"   stored="true"  />
+  <field name="facet_classification" type="string"        multiValued="true"    indexed="true"   stored="true"  />
+  <field name="facet_language"       type="string"        multiValued="false"   indexed="true"   stored="true"  />
+  <field name="facet_subject"        type="string"        multiValued="true"    indexed="true"   stored="true"  />
+  <field name="fulltext"             type="text_general"  multiValued="false"   indexed="true"   stored="false" />
+  <field name="gid"                  type="int"           multiValued="false"   indexed="true"   stored="true"  />
+  <field name="language"             type="text_general"  multiValued="false"   indexed="true"   stored="true"  />
+  <field name="rights"               type="text_general"  multiValued="false"   indexed="true"   stored="true"  />
+  <field name="subject"              type="text_general"  multiValued="true"    indexed="true"   stored="true"  />
+  <field name="title"                type="text_general"  multiValued="false"   indexed="true"   stored="true"  />
 
   <!-- cool field -->
   <copyField source="*" dest="_text_"/>
