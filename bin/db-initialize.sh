@@ -10,7 +10,7 @@
 DB='./etc/gutenberg.db'
 SQL='./sql/initialize.sql'
 SCHEMA='./etc/schema.sql'
-GID='./sql/gid.sql'
+INSERTS='./sql/inserts.sql'
 
 # initialize
 rm -rf $DB
@@ -18,7 +18,7 @@ cat $SCHEMA | sqlite3 $DB
 
 # update
 echo "BEGIN TRANSACTION;" >  $SQL
-cat $GID                  >> $SQL
+cat $INSERTS              >> $SQL
 echo "END TRANSACTION;"   >> $SQL
 
 # do the work and done

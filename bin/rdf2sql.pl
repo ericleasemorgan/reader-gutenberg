@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 # rdf2sql.pl - given a (Project Gutenberg) RDF file, output SQL statements
-# usage: find cache -name "*.rdf" | parallel ./rdf2sql.pl {} > ./gutenberg.sql 
+# usage: find cache -name "*.rdf" | parallel --gnu /rdf2sql.pl {} > ./inserts.sql 
 
 # Eric Lease Morgan <eric_morgan@infomotions.com>
 # May 1, 2019 - first cut
@@ -18,16 +18,6 @@ if ( ! $rdf ) { die "Usage: $0 <rdf>\n" }
 # initialize
 my $parser = XML::XPath->new( filename => $rdf );
 binmode( STDOUT, ':utf8' );
-
-# subjects
-my @subjects = ();
-my $subjects = $parser->find( '//dcterms:subject' ); 
-foreach my $subject ( $subjects->get_nodelist ) {
-
-	my $item = $subject->find( './rdf:Description/rdf:value' );
-	push( @subjects, $item );
-	
-}
 
 # author/creator
 my @authors = ();
@@ -104,15 +94,72 @@ foreach my $identifier ( $identifiers->get_nodelist ) {
 	
 }
 
+# subjects
+my @subjects        = ();
+my @classifications = ();
+my $subjects = $parser->find( '//dcterms:subject' ); 
+foreach my $subject ( $subjects->get_nodelist ) {
+
+	my $item = $subject->find( './rdf:Description/rdf:value' );
+	
+	# check for call number-esque value
+	if ( length( $item ) == 2 ) { push(  @classifications, $item ) }
+	else { push( @subjects, $item ) }
+	
+}
+
 # debug
-print "  identifiers(s): " . join( '; ', @identifiers ) . "\n";
-print "       titles(s): " . join( '; ', @titles ) . "\n";
-print "       author(s): " . join( '; ', @authors ) . "\n";
-print "      subject(s): " . join( '; ', @subjects ) . "\n";
-print "       rights(s): " . join( '; ', @rights ) . "\n";
-print "    languages(s): " . join( '; ', @languages ) . "\n";
-print "        files(s): " . join( '; ', @urls ) . "\n";
-print "\n\n";
+warn "      identifiers(s): " . join( '; ', @identifiers ) . "\n";
+warn "           titles(s): " . join( '; ', @titles ) . "\n";
+warn "           author(s): " . join( '; ', @authors ) . "\n";
+warn "          subject(s): " . join( '; ', @subjects ) . "\n";
+warn "  classifications(s): " . join( '; ', @classifications ) . "\n";
+warn "           rights(s): " . join( '; ', @rights ) . "\n";
+warn "        languages(s): " . join( '; ', @languages ) . "\n";
+warn "            files(s): " . join( '; ', @urls ) . "\n";
+warn "\n\n";
+
+# select
+my $gid      = $identifiers[ 0 ];
+my $title    = $titles[ 0 ];
+my $author   = $authors[ 0 ];
+my $language = $languages[ 0 ];
+my $rights   = $rights[ 0 ];
+
+# escape
+$title  =~ s/'/''/g;
+$author =~ s/'/''/g;
+
+# begin output
+print "INSERT INTO titles ( gid, title, author, language, rights ) VALUES ( '$gid', '$title', '$author', '$language', '$rights' );\n";
+
+# loop through each classification
+for my $classification ( @classifications ) {
+
+	# normalize and output
+	$classification =~ s/'/''/g;
+	print "INSERT INTO classifications ( gid, classification ) VALUES ( '$gid', '$classification' );\n";
+
+}
+
+# loop through each subject
+for my $subject ( @subjects ) {
+
+	# normalize and output
+	$subject =~ s/'/''/g;
+	print "INSERT INTO subjects ( gid, subject ) VALUES ( '$gid', '$subject' );\n";
+
+}
+
+# loop through each file (url)
+for ( sort keys %files ) {
+
+	# normalize and output
+	my $file = $_;
+	my $mime = $files{ $file };
+	print "INSERT INTO files ( gid, file, mime ) VALUES ( '$gid', '$file', '$mime' );\n";
+
+}
 
 # done
 exit;
