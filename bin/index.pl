@@ -9,7 +9,7 @@
 # configure
 use constant DATABASE => './etc/gutenberg.db';
 use constant DRIVER   => 'SQLite';
-use constant QUERY    => qq(SELECT * FROM titles WHERE ( language IS 'en' AND rights IS 'Public domain in the USA.' ) ORDER BY gid;);
+use constant QUERY    => qq(SELECT t.*, f.file FROM titles AS t, files AS f WHERE t.language IS 'en' AND f.file LIKE '%.txt.utf-8' AND t.gid = f.gid ORDER BY gid;);
 use constant SOLR     => 'http://localhost:8983/solr/gutenberg';
 use constant GET      => './bin/get.sh';
 #use constant START    => 1000;
@@ -42,6 +42,7 @@ while( my $titles = $handle->fetchrow_hashref ) {
 	my $author   = $$titles{ 'author' };
 	my $rights   = $$titles{ 'rights' };
 	my $language = $$titles{ 'language' };
+	my $file     = $$titles{ 'file' };
 	
 	# limit indexing, so I don't have to start from the begining
 	#next if ( $gid < START );
@@ -88,6 +89,7 @@ while( my $titles = $handle->fetchrow_hashref ) {
 	warn "         subject(s): ", join( '; ', @subjects ), "\n";
 	warn "          facets(s): ", join( '; ', @facet_subjects ), "\n";
 	warn "  classification(s): ", join( '; ', @classifications ), "\n";
+	warn "               file: $file\n";
 	#warn "   full text: $fulltext\n";
 	warn "\n";
 	
@@ -95,6 +97,7 @@ while( my $titles = $handle->fetchrow_hashref ) {
 	my $solr_author         = WebService::Solr::Field->new( 'author'         => $author );
 	my $solr_facet_author   = WebService::Solr::Field->new( 'facet_author'   => $author );
 	my $solr_facet_language = WebService::Solr::Field->new( 'facet_language' => $language );
+	my $solr_file           = WebService::Solr::Field->new( 'file'           => $file );
 	my $solr_gid            = WebService::Solr::Field->new( 'gid'            => $gid );
 	my $solr_langauge       = WebService::Solr::Field->new( 'language'       => $language );
 	my $solr_rights         = WebService::Solr::Field->new( 'rights'         => $rights );
@@ -103,7 +106,7 @@ while( my $titles = $handle->fetchrow_hashref ) {
 
 	# fill a solr document with simple fields
 	my $doc = WebService::Solr::Document->new;
-	$doc->add_fields( $solr_facet_language, $solr_author, $solr_facet_author, $solr_gid, $solr_langauge, $solr_rights, $solr_title );
+	$doc->add_fields( $solr_facet_language, $solr_author, $solr_facet_author, $solr_gid, $solr_langauge, $solr_rights, $solr_title, $solr_file );
 
 	# add complex fields
 	foreach ( @classifications ) { $doc->add_fields(( WebService::Solr::Field->new( 'facet_classification' => $_ ))) }

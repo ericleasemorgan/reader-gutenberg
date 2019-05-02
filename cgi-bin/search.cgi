@@ -4,6 +4,7 @@
 
 # Eric Lease Morgan <emorgan@nd.edu>
 # April 30, 2019 - first cut; based on Project English
+# May    2, 2019 - added classification and files (urls)
 
 
 # configure
@@ -97,9 +98,10 @@ else {
 	for my $doc ( $response->docs ) {
 	
 		# parse
-		my $author   = $doc->value_for(  'author' );
-		my $title    = $doc->value_for(  'title' );
-		my $gid      = $doc->value_for(  'gid' );
+		my $author = $doc->value_for( 'author' );
+		my $title  = $doc->value_for( 'title' );
+		my $gid    = $doc->value_for( 'gid' );
+		my $file   = $doc->value_for( 'file' );
 		
 		my @classifications = ();
 		foreach my $classification ( $doc->values_for( 'classification' ) ) {
@@ -132,6 +134,7 @@ else {
 		my $item = &item( $title, $author, scalar( @subjects ), scalar( @classifications ), $gid );
 		$item =~ s/##TITLE##/$title/g;
 		$item =~ s/##AUTHOR##/$author/eg;
+		$item =~ s/##FILE##/$file/eg;
 		$item =~ s/##SUBJECTS##/$subjects/eg;
 		$item =~ s/##CLASSIFICATIONS##/join( '; ', @classifications )/eg;
 		$item =~ s/##GID##/$gid/ge;
@@ -200,7 +203,7 @@ sub item {
 	my $author          = shift;
 	my $subjects        = shift;
 	my $classifications = shift;
-	my $item      = "<li class='item'><a href='/sandbox/gutenberg/cgi-bin/get.cgi?gid=##GID##'>##TITLE##</a><ul>";
+	my $item      = "<li class='item'><a href='##FILE##'>##TITLE##</a><ul>";
 	if ( $author )          { $item .= "<li style='list-style-type:circle'>##AUTHOR##</li>" }
 	if ( $subjects )        { $item .= "<li style='list-style-type:circle'>##SUBJECTS##</li>" }
 	if ( $classifications ) { $item .= "<li style='list-style-type:circle'>##CLASSIFICATIONS##</li>" }

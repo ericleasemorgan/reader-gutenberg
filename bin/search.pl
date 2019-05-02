@@ -4,6 +4,7 @@
 
 # Eric Lease Morgan <emorgan@nd.edu>
 # April 30, 2019 - first cut; based on earlier work
+# May    2, 2019 - added classification and files (urls)
 
 
 # configure
@@ -72,6 +73,7 @@ for my $doc ( $response->docs ) {
 	my $title           = $doc->value_for(  'title' );
 	my $gid             = $doc->value_for(  'gid' );
 	my $rights          = $doc->value_for(  'rights' );
+	my $file            = $doc->value_for(  'file' );
 	my $language        = $doc->value_for(  'language' );
 	my @subjects        = $doc->values_for( 'subject' );
 	my @classifications = $doc->values_for( 'classification' );
@@ -83,6 +85,7 @@ for my $doc ( $response->docs ) {
 	print "  classifications(s): " . join( '; ', @classifications ), "\n";
 	print "            language: $language\n";
 	print "              rights: $rights\n";
+	print "                file: $file\n";
 	print "                 gid: $gid\n";
 	print "\n";
 

@@ -1,7 +1,4 @@
 .DS_Store
 etc/*.db
-etc/metadata
-etc/metadata.json
-etc/text
 sql/*.sql
 rdf
