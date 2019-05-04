@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 # rdf2sql.pl - given a (Project Gutenberg) RDF file, output SQL statements
-# usage: find cache -name "*.rdf" | parallel --gnu /rdf2sql.pl {} > ./inserts.sql 
+# usage: find rdf -name "*.rdf" | parallel --gnu ./bin/rdf2sql.pl {} > ./sql/inserts.sql 
 
 # Eric Lease Morgan <eric_morgan@infomotions.com>
 # May 1, 2019 - first cut
