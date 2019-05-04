@@ -3,4 +3,4 @@ etc/*.db
 rdf/
 sql/*.sql
 texts/*.txt
-tmp/*
+tmp/*.txt
