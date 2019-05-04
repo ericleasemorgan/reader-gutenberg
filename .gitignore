@@ -1,4 +1,6 @@
 .DS_Store
 etc/*.db
+rdf/
 sql/*.sql
-rdf
+texts/*.txt
+tmp/*
