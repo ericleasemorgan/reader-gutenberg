@@ -10,6 +10,7 @@
 # configure
 use constant FACETFIELD => ( 'facet_subject', 'facet_author', 'facet_language', 'facet_classification' );
 use constant SOLR       => 'http://localhost:8983/solr/gutenberg';
+use constant TEXTS      => './texts';
 
 # require
 use strict;
@@ -22,6 +23,7 @@ if ( ! $query or ! $rows ) { die "Usage: $0 <query> <integer>\n" }
 
 # initialize
 my $solr = WebService::Solr->new( SOLR );
+my $texts = TEXTS;
 
 # build the search options
 my %search_options = ();
@@ -77,7 +79,10 @@ for my $doc ( $response->docs ) {
 	my $language        = $doc->value_for(  'language' );
 	my @subjects        = $doc->values_for( 'subject' );
 	my @classifications = $doc->values_for( 'classification' );
-			
+	
+	# create file name
+	my $filename = "$texts/$gid.txt";
+	
 	# output
 	print "$title\n";
 	print "              author: $author\n";
@@ -87,6 +92,7 @@ for my $doc ( $response->docs ) {
 	print "              rights: $rights\n";
 	print "                file: $file\n";
 	print "                 gid: $gid\n";
+	print "            filename: $filename\n";
 	print "\n";
 
 }

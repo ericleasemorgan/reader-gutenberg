@@ -13,6 +13,7 @@
 use constant QUERY    => qq(SELECT file FROM files WHERE file LIKE "%.txt.utf-8" AND (##CLAUSE##) ORDER BY gid;);
 use constant DATABASE => '../etc/gutenberg.db';
 use constant DRIVER   => 'SQLite';
+use constant ROOT     => 'http://dh.crc.nd.edu/sandbox/gutenberg/texts';
 
 # require
 use CGI;
@@ -40,6 +41,9 @@ else {
 	$gids    =~ s/[[:punct:]]/ /g;
 	$gids    =~ s/ +/ /g;
 	@gids    =  split( ' ', $gids );
+	
+	# initialize
+	my $root = ROOT;
 
 	# VALIDATE INPUT HERE; we don't need to leave an opportunity for sql injection!
 
@@ -60,17 +64,17 @@ else {
 	$handle->execute() or die $DBI::errstr;
 
 	# process each item in the found set
-	my @files = ();
-	while( my $files = $handle->fetchrow_hashref ) {
+	my @urls = ();
+	foreach my $gid ( sort @gids ) {
 	
 		# parse the title data
-		push( @files, $$files{ 'file' } );
+		push( @urls, "$root/$gid.txt" );
 			
 	}
 
 	# dump the database and done
 	print $cgi->header( -type => 'text/plain', -charset => 'utf-8');
-	print join( "\n", @files ), "\n";
+	print join( "\n", @urls ), "\n";
 	
 }
 
@@ -106,7 +110,7 @@ sub form {
 
 	<p>Given a set of one or more identifiers, this program will return a list of URLs pointing to plain text versions of the items.</p>
 	<form method='POST' action='/sandbox/gutenberg/cgi-bin/gids2urls.cgi'>
-	<input type='text' name='gids' size='50' value='150 1571 1580 1579 1572 1591 1584 1598 1672'/>
+	<input type='text' name='gids' size='50' value='21711 36000 13500'/>
 	<input type='submit' value='Get URLs' />
 	</form>
 
