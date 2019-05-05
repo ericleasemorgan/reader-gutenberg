@@ -11,9 +11,9 @@ use constant DATABASE => './etc/gutenberg.db';
 use constant DRIVER   => 'SQLite';
 use constant QUERY    => qq(SELECT t.*, f.file FROM titles AS t, files AS f WHERE t.language IS 'en' AND f.file LIKE '%.txt.utf-8' AND t.gid = f.gid ORDER BY gid;);
 use constant SOLR     => 'http://localhost:8983/solr/gutenberg';
-use constant GET      => './bin/get.sh';
+use constant MAX      => 100000;
+use constant TEXTS    => './texts';
 #use constant START    => 1000;
-use constant MAX      => 1000000;
 
 # require
 use DBI;
@@ -21,12 +21,12 @@ use strict;
 use WebService::Solr;
 
 # initialize
-my $solr   = WebService::Solr->new( SOLR );
-binmode( STDOUT, ':utf8' );
+my $solr      = WebService::Solr->new( SOLR );
 my $driver    = DRIVER; 
 my $database  = DATABASE;
 my $dbh       = DBI->connect( "DBI:$driver:dbname=$database", '', '', { RaiseError => 1 } ) or die $DBI::errstr;
-my $get       = GET;
+my $texts     = TEXTS;
+binmode( STDOUT, ':utf8' );
 
 # find titles
 my $handle = $dbh->prepare( QUERY );
@@ -74,11 +74,11 @@ while( my $titles = $handle->fetchrow_hashref ) {
 	}
 	
 	# get the full text and normalize it
-	#my $fulltext = `$get $gid`;
-	#$fulltext    =~ s/\r//g;
-	#$fulltext    =~ s/\n/ /g;
-	#$fulltext    =~ s/ +/ /g;
-	#$fulltext    =~ s/[^\x09\x0A\x0D\x20-\x{D7FF}\x{E000}-\x{FFFD}\x{10000}-\x{10FFFF}]//go;
+	my $fulltext = &slurp( "$texts/$gid.txt" );
+	$fulltext    =~ s/\r//g;
+	$fulltext    =~ s/\n/ /g;
+	$fulltext    =~ s/ +/ /g;
+	$fulltext    =~ s/[^\x09\x0A\x0D\x20-\x{D7FF}\x{E000}-\x{FFFD}\x{10000}-\x{10FFFF}]//go;
 	
 	# debug; dump
 	warn "                gid: $gid\n";
@@ -90,7 +90,7 @@ while( my $titles = $handle->fetchrow_hashref ) {
 	warn "          facets(s): ", join( '; ', @facet_subjects ), "\n";
 	warn "  classification(s): ", join( '; ', @classifications ), "\n";
 	warn "               file: $file\n";
-	#warn "   full text: $fulltext\n";
+	#warn "          full text: $fulltext\n";
 	warn "\n";
 	
 	# create data
@@ -102,11 +102,11 @@ while( my $titles = $handle->fetchrow_hashref ) {
 	my $solr_langauge       = WebService::Solr::Field->new( 'language'       => $language );
 	my $solr_rights         = WebService::Solr::Field->new( 'rights'         => $rights );
 	my $solr_title          = WebService::Solr::Field->new( 'title'          => $title );
-	#my $solr_fulltext       = WebService::Solr::Field->new( 'fulltext'       => $fulltext );
+	my $solr_fulltext       = WebService::Solr::Field->new( 'fulltext'       => $fulltext );
 
 	# fill a solr document with simple fields
 	my $doc = WebService::Solr::Document->new;
-	$doc->add_fields( $solr_facet_language, $solr_author, $solr_facet_author, $solr_gid, $solr_langauge, $solr_rights, $solr_title, $solr_file );
+	$doc->add_fields( $solr_facet_language, $solr_author, $solr_facet_author, $solr_gid, $solr_langauge, $solr_rights, $solr_title, $solr_file, $solr_fulltext );
 
 	# add complex fields
 	foreach ( @classifications ) { $doc->add_fields(( WebService::Solr::Field->new( 'facet_classification' => $_ ))) }
@@ -126,3 +126,13 @@ while( my $titles = $handle->fetchrow_hashref ) {
 # done
 exit;
 
+
+sub slurp {
+
+	my $f = shift;
+	open ( F, $f ) or die "Can't open $f: $!\n";
+	my $r = do { local $/; <F> };
+	close F;
+	return $r;
+
+}
