@@ -5,12 +5,13 @@
 # Eric Lease Morgan <emorgan@nd.edu>
 # April 30, 2019 - first cut; based on Project English
 # May    2, 2019 - added classification and files (urls)
+# May    9, 2019 - added tsv output
 
 
 # configure
 use constant FACETFIELD => ( 'facet_subject', 'facet_author', 'facet_classification' );
 use constant SOLR       => 'http://localhost:8983/solr/gutenberg';
-use constant ROWS       => 199;
+use constant ROWS       => 499;
 use constant NUMERALS   => ( '1'=>'I','2'=>'II','3'=>'III','4'=>'IV', '5'=>'V', '6'=>'VI', '7'=>'VII', '8'=>'VIII', '9'=>'IX', '10'=>'X' );
 
 # require
@@ -104,8 +105,11 @@ else {
 		my $file   = $doc->value_for( 'file' );
 		
 		# update the list of dids
-		push(@gids, $gid );
+		push( @gids, $gid );
 
+		# hyperlink the author
+		$author = qq(<a href='/sandbox/gutenberg/cgi-bin/search.cgi?query=author:"$author"'>$author</a>);
+		
 		my @classifications = ();
 		foreach my $classification ( $doc->values_for( 'classification' ) ) {
 		
@@ -150,10 +154,14 @@ else {
 	my $gid2urls = &ids2urls;
 	$gid2urls    =~ s/##IDS##/join( ' ', @gids )/e;
 
+	my $gid2tsv = &ids2tsv;
+	$gid2tsv    =~ s/##IDS##/join( ' ', @gids )/e;
+
 	# build the html
 	$html =  &results_template;
 	$html =~ s/##RESULTS##/&results/e;
 	$html =~ s/##ID2URLS##/$gid2urls/ge;
+	$html =~ s/##ID2TSV##/$gid2tsv/ge;
 	$html =~ s/##QUERY##/$sanitized/e;
 	$html =~ s/##TOTAL##/$total/e;
 	$html =~ s/##HITS##/scalar( @hits )/e;
@@ -195,7 +203,9 @@ sub get_facets {
 sub results {
 
 	return <<EOF
-	<p>Your search found ##TOTAL## item(s) and ##HITS## item(s) are displayed. ##ID2URLS##</p>
+	<p>Your search found ##TOTAL## item(s) and ##HITS## item(s) are displayed.</p>
+	
+	<p>List ##ID2URLS## or ##ID2TSV##</p>
 		
 	<h3>Items</h3><ol>##ITEMS##</ol>
 EOF
@@ -325,7 +335,15 @@ EOF
 sub ids2urls {
 
 	return <<EOF
-(<a href="/sandbox/gutenberg/cgi-bin/gids2urls.cgi?gids=##IDS##">List URLs</a>)
+<a href="/sandbox/gutenberg/cgi-bin/gids2urls.cgi?gids=##IDS##">only local URLs</a>
+EOF
+
+}
+
+sub ids2tsv {
+
+	return <<EOF
+<a href="/sandbox/gutenberg/cgi-bin/gids2tsv.cgi?gids=##IDS##">as tab-separated values</a>
 EOF
 
 }
