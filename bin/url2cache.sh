@@ -22,7 +22,7 @@ OUTPUTFILE="$DIRECTORY/$KEY.txt"
 if [[ ! -f $OUTPUTFILE ]]; then
 
 	TEMPORARYFILE="$TMP/$KEY.txt"
-	wget -nv -O $TEMPORARYFILE $URL
+	wget --no-check-certificate -nv -O $TEMPORARYFILE $URL
 	$STRIP $TEMPORARYFILE > $OUTPUTFILE
 	rm $TEMPORARYFILE
 

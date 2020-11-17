@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # index.pl - make the content searchable
 
@@ -10,8 +10,8 @@
 use constant DATABASE => './etc/gutenberg.db';
 use constant DRIVER   => 'SQLite';
 use constant QUERY    => qq(SELECT t.*, f.file FROM titles AS t, files AS f WHERE t.language IS 'en' AND f.file LIKE '%.txt.utf-8' AND t.gid = f.gid ORDER BY gid;);
-use constant SOLR     => 'http://localhost:8983/solr/gutenberg';
-use constant MAX      => 100000;
+use constant SOLR     => 'http://localhost:8983/solr/reader-gutenberg';
+use constant MAX      => 10000;
 use constant TEXTS    => './texts';
 #use constant START    => 1000;
 

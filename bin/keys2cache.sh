@@ -12,5 +12,5 @@ SQL="select t.gid, f.file from titles as t, files as f where t.gid = f.gid and f
 URL2CACHE='./bin/url2cache.sh'
 
 # execute the SQL, parse, do the work, and done
-echo $SQL | sqlite3 $DB | tr "|" " " | parallel --colsep ' ' $URL2CACHE {1} {2}  
+echo $SQL | sqlite3 $DB | tr "|" " " | parallel --will-cite --colsep ' ' $URL2CACHE {1} {2}  
 exit

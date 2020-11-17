@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Solr managed schema - automatically generated - DO NOT EDIT -->
+<schema name="reader-gutenberg" version="1.6">
+  <uniqueKey>gid</uniqueKey>
+  <fieldType name="int" class="solr.TrieIntField" positionIncrementGap="0" docValues="true" precisionStep="0"/>
+  <fieldType name="long" class="solr.TrieLongField" positionIncrementGap="0" docValues="true" precisionStep="0"/>
+  <fieldType name="string" class="solr.StrField" sortMissingLast="true" docValues="true"/>
+  <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100" multiValued="true">
+    <analyzer type="index">
+      <tokenizer class="solr.StandardTokenizerFactory"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+    </analyzer>
+    <analyzer type="query">
+      <tokenizer class="solr.StandardTokenizerFactory"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+    </analyzer>
+  </fieldType>
+  <field name="_root_" type="int" docValues="false" indexed="true" stored="false"/>
+  <field name="_text_" type="text_general" multiValued="true" indexed="true" stored="false"/>
+  <field name="_version_" type="long" indexed="true" stored="false"/>
+  <field name="author" type="text_general" multiValued="false" indexed="true" stored="true"/>
+  <field name="classification" type="text_general" multiValued="true" indexed="true" stored="true"/>
+  <field name="facet_author" type="string" multiValued="false" indexed="true" stored="true"/>
+  <field name="facet_classification" type="string" multiValued="true" indexed="true" stored="true"/>
+  <field name="facet_language" type="string" multiValued="false" indexed="true" stored="true"/>
+  <field name="facet_subject" type="string" multiValued="true" indexed="true" stored="true"/>
+  <field name="file" type="string" multiValued="false" indexed="false" stored="true"/>
+  <field name="fulltext" type="text_general" multiValued="false" indexed="true" stored="false"/>
+  <field name="gid" type="int" multiValued="false" indexed="true" stored="true"/>
+  <field name="language" type="text_general" multiValued="false" indexed="true" stored="true"/>
+  <field name="rights" type="text_general" multiValued="false" indexed="true" stored="true"/>
+  <field name="subject" type="text_general" multiValued="true" indexed="true" stored="true"/>
+  <field name="title" type="text_general" multiValued="false" indexed="true" stored="true"/>
+  <copyField source="*" dest="_text_"/>
+</schema>

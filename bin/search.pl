@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # search.pl - command-line interface to search a solr instance
 
@@ -9,12 +9,13 @@
 
 # configure
 use constant FACETFIELD => ( 'facet_subject', 'facet_author', 'facet_language', 'facet_classification' );
-use constant SOLR       => 'http://localhost:8983/solr/gutenberg';
+use constant SOLR       => 'http://localhost:8983/solr/reader-gutenberg';
 use constant TEXTS      => './texts';
 
 # require
 use strict;
 use WebService::Solr;
+use Data::Dumper;
 
 # get input; sanity check
 my $query  = $ARGV[ 0 ];
@@ -84,15 +85,15 @@ for my $doc ( $response->docs ) {
 	my $filename = "$texts/$gid.txt";
 	
 	# output
-	print "$title\n";
+	print "\n$title\n\n";
 	print "              author: $author\n";
 	print "          subject(s): " . join( '; ', @subjects ), "\n";
 	print "  classifications(s): " . join( '; ', @classifications ), "\n";
 	print "            language: $language\n";
 	print "              rights: $rights\n";
-	print "                file: $file\n";
+	print "          remote URL: $file\n";
 	print "                 gid: $gid\n";
-	print "            filename: $filename\n";
+	print "          locel file: $filename\n";
 	print "\n";
 
 }

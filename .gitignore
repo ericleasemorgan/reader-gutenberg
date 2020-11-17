@@ -4,3 +4,5 @@ rdf/
 sql/*.sql
 texts/*.txt
 tmp/*.txt
+log
+zips
