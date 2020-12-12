@@ -9,7 +9,7 @@
 
 # configure
 use constant FACETFIELD => ( 'facet_subject', 'facet_author', 'facet_language', 'facet_classification' );
-use constant SOLR       => 'http://localhost:8983/solr/reader-gutenberg';
+use constant SOLR       => 'http://10.0.1.11:8983/solr/reader-gutenberg';
 use constant TEXTS      => './texts';
 
 # require
@@ -92,8 +92,8 @@ for my $doc ( $response->docs ) {
 	print "            language: $language\n";
 	print "              rights: $rights\n";
 	print "          remote URL: $file\n";
+	print "          local file: $filename\n";
 	print "                 gid: $gid\n";
-	print "          locel file: $filename\n";
 	print "\n";
 
 }
