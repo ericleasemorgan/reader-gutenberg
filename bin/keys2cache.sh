@@ -8,7 +8,9 @@
 
 # configure
 DB='./etc/gutenberg.db'
-SQL="select t.gid, f.file from titles as t, files as f where t.gid = f.gid and file like '%.txt.utf-8' AND t.language IS 'en' order by t.gid;"
+#SQL="select t.gid, f.file from titles as t, files as f where t.gid = f.gid and file like '%.txt.utf-8' AND t.language IS 'en' order by t.gid;"
+#SQL="select t.gid, f.file from titles as t, files as f where t.gid = f.gid and file like '%.txt' AND t.language IS 'en' order by t.gid;"
+SQL="select t.gid, f.file from titles as t, files as f where t.gid = f.gid and file like '%.txt%' AND file NOT LIKE '%readme%' AND t.language IS 'en' order by t.gid;"
 URL2CACHE='./bin/url2cache.sh'
 
 # execute the SQL, parse, do the work, and done

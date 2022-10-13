@@ -6,3 +6,4 @@ texts/*.txt
 tmp/*.txt
 log
 zips
+etc/rdf-files.tar.zip

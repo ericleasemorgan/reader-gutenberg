@@ -21,6 +21,7 @@ $text       =~ s/\r//g;
 my @lines   =  split( "\n", $text );
 my @cleaned =  ();
 my $end     =  0;
+binmode( STDOUT, ":utf8" );
 
 # process each line
 foreach my $line ( @lines ) {
