@@ -5,12 +5,13 @@
 # Eric Lease Morgan <emorgan@nd.edu>
 # (c) University of Notre Dame; distributed under a GNU Public License
 
-# October 13, 2022 - first cut
+# October  13, 2022 - first cut
+# November 11, 2022 - added URL
 
 
 # configure
 DATABASE='./etc/gutenberg.db'
-SQL=".mode lines\nSELECT gid, author, title, subject, classification FROM indx WHERE indx MATCH '##QUERY##' ORDER BY RANK;"
+SQL=".mode lines\nSELECT gid, url, author, title, subject, classification FROM indx WHERE indx MATCH '##QUERY##' ORDER BY RANK;"
 
 # sanity check
 if [[ -z $1 ]]; then

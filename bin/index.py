@@ -5,14 +5,15 @@
 # Eric Lease Morgan <emorgan@nd.edu>
 # (c) University of Notre Dame; distributed under a GNU Public License
 
-# October 13, 2022 - first cut; based on previous work ("I've only written a dozen programs.")
+# October  13, 2022 - first cut; based on previous work ("I've only written a dozen programs.")
+# November 11, 2022 - added URL; cool!
 
 
 # configure
 DATABASE   = './etc/gutenberg.db'
 DROPINDX   = 'DROP TABLE IF EXISTS indx;'
-CREATEINDX = 'CREATE VIRTUAL TABLE indx USING FTS5( gid, author, title, subject, classification );'
-INDEX      = 'INSERT INTO indx SELECT t.gid, t.author, t.title, group_concat( s.subject, "; " ), c.classification FROM titles AS t, subjects AS s, classifications AS c WHERE t.gid IS s.gid AND t.gid IS c.gid AND t.language IS "en" GROUP BY s.gid;';
+CREATEINDX = 'CREATE VIRTUAL TABLE indx USING FTS5( gid, url, author, title, subject, classification );'
+INDEX      = 'INSERT INTO indx SELECT t.gid, "https://distantreader.org/stacks/books/" || t.gid || ".txt", t.author, t.title, group_concat( s.subject, "; " ), c.classification FROM titles AS t, subjects AS s, classifications AS c WHERE t.gid IS s.gid AND t.gid IS c.gid AND t.language IS "en" GROUP BY s.gid;';
 
 # require
 import sqlite3

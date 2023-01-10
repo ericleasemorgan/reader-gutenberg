@@ -1,9 +1,13 @@
 .DS_Store
 etc/*.db
+etc/rdf-files.tar.zip
+log
 rdf/
 sql/*.sql
 texts/*.txt
 tmp/*.txt
-log
+x-*
 zips
-etc/rdf-files.tar.zip
+tmp
+corpora
+texts
